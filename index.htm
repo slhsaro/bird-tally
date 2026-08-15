@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Bird Tally — Houston &amp; Katy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#083335;
+    --secondary:#F6F3E4;
+    --paper-line: rgba(8,51,53,0.15);
+    --ink:#0B2626;
+    --teal-700:#0F4B4D;
+    --teal-500:#1C6D68;
+    --teal-300:#4C8F86;
+    --bayou:#0B4B52;
+    --prairie-gold:#B98B2E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--secondary);
+    color:var(--ink);
+    font-family:'Public Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background-image: radial-gradient(rgba(8,51,53,0.055) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+  .display{ font-family:'Bobby Jones Soft','Fredoka',system-ui,sans-serif; }
+  .wrap{ max-width:1040px; margin:0 auto; padding:36px 20px 60px; }
+
+  header{ text-align:center; margin-bottom:22px; }
+  .eyebrow{ font-weight:600; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--teal-500); margin:0 0 10px; }
+  h1{ font-weight:600; font-size:clamp(26px,4.2vw,40px); line-height:1.08; margin:0 0 12px; color:var(--primary); }
+  header p{ max-width:520px; margin:0 auto; color:#3C4E4C; font-size:14.5px; line-height:1.55; }
+
+  .total-band{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:#FFFDF6; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding:14px 18px; margin:22px 0; text-align:center;
+  }
+  .total-num{ font-weight:700; font-size:26px; color:var(--primary); font-family:'Fredoka',sans-serif; }
+  .total-label{ font-size:12.5px; color:#5c6b64; }
+
+  h2.section{ font-weight:600; font-size:18px; color:var(--primary); margin:26px 0 4px; }
+  .section-sub{ font-size:13px; color:#5c6b64; margin:0 0 14px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px; }
+  .species-card{
+    background:#FFFDF6; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding:14px; display:flex; flex-direction:column; gap:8px;
+  }
+  .sp-top{ display:flex; align-items:center; gap:11px; }
+  .badge{ width:48px; height:48px; border-radius:12px; background:var(--secondary-deep, #EEE6CC); border:1.5px solid var(--paper-line); display:flex; align-items:center; justify-content:center; flex:none; overflow:hidden; }
+  .badge img.sp-photo{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+  .badge svg{ width:20px; height:20px; }
+  .sp-name{ font-weight:600; font-size:14.5px; color:var(--primary); line-height:1.2; }
+  .sp-latin{ font-style:italic; font-size:11px; color:#6a7a72; margin:1px 0 0; }
+
+  .see-btn{
+    margin-top:2px; border:1.5px solid var(--teal-500); background:transparent; color:var(--teal-700);
+    font-family:'Public Sans'; font-weight:600; font-size:12.5px; letter-spacing:.01em;
+    padding:8px 10px; border-radius:9px; cursor:pointer; transition:background .15s ease, color .15s ease;
+  }
+  .see-btn:hover{ background:var(--teal-500); color:#FFFDF6; }
+  .see-btn:disabled{
+    cursor:default; background:var(--primary); border-color:var(--primary); color:#FFFDF6; opacity:.9;
+  }
+  .see-btn.err{ border-color:#B24A3D; color:#B24A3D; }
+
+  /* ---- chart ---- */
+  .chart{ display:flex; flex-direction:column; gap:9px; margin-top:10px; }
+  .bar-row{ display:grid; grid-template-columns:150px 1fr 34px; align-items:center; gap:10px; }
+  .bar-name{ font-size:12.5px; font-weight:600; color:var(--primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bar-track{ background:#EFE8D3; border-radius:8px; height:16px; overflow:hidden; }
+  .bar-fill{ height:100%; border-radius:8px; transition:width .5s ease; }
+  .bar-count{ font-size:12px; font-weight:700; color:var(--primary); text-align:right; }
+
+  .empty-note, .loading-note{ font-size:13px; color:#7a8a83; padding:10px 2px; }
+
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    margin-top:26px; padding-top:14px; border-top:1px dashed var(--paper-line);
+  }
+  .reset-link{ font-size:12px; color:#7a8a83; background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; }
+  .fineprint{ font-size:11px; color:#9a9480; }
+
+  @media (max-width:520px){
+    .bar-row{ grid-template-columns:100px 1fr 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1 class="display">What Has Everyone Been Seeing?</h1>
+    <p>Tap a bird below the first time you spot it out in Houston or Katy. Every tap adds to the community tally.</p>
+  </header>
+
+  <div class="total-band">
+    <span class="total-num" id="total-num">–</span>
+    <span class="total-label">community sightings logged so far</span>
+  </div>
+
+  <h2 class="section">Tap what you've seen</h2>
+  <p class="section-sub">One tap per bird, per visitor — it'll mark itself once logged.</p>
+  <div class="grid" id="grid"></div>
+
+  <h2 class="section">Live tally</h2>
+  <p class="section-sub" id="chart-sub">Sorted by most-spotted.</p>
+  <div class="chart" id="chart"><p class="loading-note">Loading community tally…</p></div>
+
+  <div class="footer-row">
+    <button class="reset-link" id="reset-btn">Reset my own taps</button>
+    <span class="fineprint">Resetting only clears what shows as logged on this device — community totals stay put.</span>
+  </div>
+</div>
+
+<script>
+const BIRD_ICON = `<svg viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M13 0 C6 0 0 5 0 12 C0 18 5 22 9 23 L7 27 L11 26 L12 27 L15 26 L18 27 L16 23 C21 21 26 17 26 11 C26 5 20 0 13 0 Z" fill="#083335"/>
+  <circle cx="18" cy="8" r="1.4" fill="#F6F3E4"/>
+</svg>`;
+
+const SPECIES = [
+  { slug:"northern-mockingbird", name:"Northern Mockingbird", latin:"Mimus polyglottos", color:"#1C6D68", photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Northern_Mockingbird.png" },
+  { slug:"northern-cardinal", name:"Northern Cardinal", latin:"Cardinalis cardinalis", color:"#1C6D68", photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Cardinal.jpg" },
+  { slug:"ruby-throated-hummingbird", name:"Ruby-throated Hummingbird", latin:"Archilochus colubris", color:"#1C6D68", photo:"https://columbusaudubon.org/wp-content/uploads/2016/03/Ruby-throated_Hummingbird_c34-2-027_l_1.jpg" },
+  { slug:"carolina-chickadee", name:"Carolina Chickadee", latin:"Poecile carolinensis", color:"#1C6D68", photo:"https://www.songofamericabirdseed.com/wp-content/uploads/2022/04/Carolina-Chickadee.jpg" },
+  { slug:"roseate-spoonbill", name:"Roseate Spoonbill", latin:"Platalea ajaja", color:"#0B4B52", photo:"https://cdn.download.ams.birds.cornell.edu/api/v2/asset/29972801/1200" },
+  { slug:"black-bellied-whistling-duck", name:"Black-bellied Whistling-Duck", latin:"Dendrocygna autumnalis", color:"#0B4B52", photo:"https://cdn.download.ams.birds.cornell.edu/api/v2/asset/59936941/900" },
+  { slug:"great-egret", name:"Great Egret", latin:"Ardea alba", color:"#0B4B52", photo:"https://upload.wikimedia.org/wikipedia/commons/f/f8/Ardea_alba_-Morro_Bay_Heron_Rookery_-8d.jpg" },
+  { slug:"anhinga", name:"Anhinga", latin:"Anhinga anhinga", color:"#0B4B52", photo: "https://www.birdsandblooms.com/wp-content/uploads/2021/12/close-up-anhinga-scaled-e1769628771710.jpg" },
+  { slug:"sandhill-crane", name:"Sandhill Crane", latin:"Antigone canadensis", color:"#B98B2E", photo:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Sandhill_Crane_JG.jpg/960px-Sandhill_Crane_JG.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=thumbnail" },
+  { slug:"northern-harrier", name:"Northern Harrier", latin:"Circus hudsonius", color:"#B98B2E", photo:"https://www.allaboutbirds.org/guide/assets/photo/305648981-480px.jpg" },
+  { slug:"loggerhead-shrike", name:"Loggerhead Shrike", latin:"Lanius ludovicianus", color:"#B98B2E", photo:"https://www.allaboutbirds.org/guide/assets/photo/65685251-480px.jpg" },
+  { slug:"eastern-meadowlark", name:"Eastern Meadowlark", latin:"Sturnella magna", color:"#B98B2E", photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Eastern_Meadowlark_RWD3.jpg" },
+  { slug:"pileated-woodpecker", name:"Pileated Woodpecker", latin:"Dryocopus pileatus", color:"#4C8F86", photo:"https://upload.wikimedia.org/wikipedia/commons/b/b6/Pileated_Woodpecker_Ash_RWD2.jpg" },
+  { slug:"red-shouldered-hawk", name:"Red-shouldered Hawk", latin:"Buteo lineatus", color:"#4C8F86", photo:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Red-shouldered_Hawk-27527-3.jpg" },
+  { slug:"barred-owl", name:"Barred Owl", latin:"Strix varia", color:"#4C8F86", photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Strix-varia-005-crop.jpg" },
+  { slug:"tufted-titmouse", name:"Tufted Titmouse", latin:"Baeolophus bicolor", color:"#4C8F86", photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Tufted_Titmouse_USA.jpg" }
+];
+
+function handleImgError(imgEl){
+  // if a photo link ever breaks, fall back cleanly to the bird icon instead of a broken-image box
+  imgEl.outerHTML = BIRD_ICON;
+}
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxDTW6FqWiicJoOAMz25Nf9rZ1vEzQ0j0v3ks_YZemN3tXAOqsh7jTQieBNBw7bACqgNQ/exec";
+const LOGGED_KEY = "my-logged-species"; // stored in this browser's localStorage
+
+let tally = {};
+let logged = [];
+
+async function fetchTally(){
+  const res = await fetch(API_URL);
+  if(!res.ok) throw new Error("fetch failed");
+  const data = await res.json();
+  return data.tally || {};
+}
+
+async function postSighting(slug){
+  const res = await fetch(API_URL, {
+    method: "POST",
+    // text/plain avoids a CORS preflight that Apps Script doesn't handle;
+    // the body itself is still JSON and doPost() parses it as such
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ species: slug })
+  });
+  if(!res.ok) throw new Error("post failed");
+  const data = await res.json();
+  return data.tally || {};
+}
+
+function getLogged(){
+  try{
+    const raw = localStorage.getItem(LOGGED_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+
+function saveLogged(list){
+  try{ localStorage.setItem(LOGGED_KEY, JSON.stringify(list)); }catch(e){ /* ignore */ }
+}
+
+const gridEl = document.getElementById('grid');
+const chartEl = document.getElementById('chart');
+const chartSubEl = document.getElementById('chart-sub');
+const totalEl = document.getElementById('total-num');
+const resetBtn = document.getElementById('reset-btn');
+
+function buildGrid(){
+  gridEl.innerHTML = SPECIES.map(s => `
+    <div class="species-card">
+      <div class="sp-top">
+        <div class="badge">${s.photo ? `<img class="sp-photo" src="${s.photo}" alt="${s.name}" loading="lazy" onerror="handleImgError(this)">` : BIRD_ICON}</div>
+        <div>
+          <div class="sp-name">${s.name}</div>
+          <div class="sp-latin">${s.latin}</div>
+        </div>
+      </div>
+      <button class="see-btn" id="btn-${s.slug}" data-slug="${s.slug}">
+        ${logged.includes(s.slug) ? "✓ Logged" : "I saw one!"}
+      </button>
+    </div>
+  `).join('');
+
+  SPECIES.forEach(s => {
+    const btn = document.getElementById('btn-' + s.slug);
+    if(logged.includes(s.slug)) btn.disabled = true;
+    btn.addEventListener('click', () => submitSighting(s.slug, btn));
+  });
+}
+
+function renderChart(){
+  const total = Object.values(tally).reduce((a,b) => a+b, 0);
+  totalEl.textContent = total;
+
+  const rows = SPECIES
+    .map(s => ({ ...s, count: tally[s.slug] || 0 }))
+    .filter(s => s.count > 0)
+    .sort((a,b) => b.count - a.count);
+
+  if(rows.length === 0){
+    chartEl.innerHTML = `<p class="empty-note">No sightings logged yet — be the first to tap one above.</p>`;
+    chartSubEl.textContent = "Sorted by most-spotted.";
+    return;
+  }
+  chartSubEl.textContent = "Sorted by most-spotted.";
+  const max = rows[0].count;
+
+  chartEl.innerHTML = rows.map(r => `
+    <div class="bar-row">
+      <div class="bar-name">${r.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(6,(r.count/max)*100)}%; background:${r.color}"></div></div>
+      <div class="bar-count">${r.count}</div>
+    </div>
+  `).join('');
+}
+
+async function submitSighting(slug, btn){
+  if(logged.includes(slug)) return;
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+
+  try{
+    const updatedTally = await postSighting(slug);
+    tally = updatedTally;
+    logged.push(slug);
+    saveLogged(logged);
+
+    btn.textContent = "✓ Logged";
+    renderChart();
+  }catch(err){
+    btn.disabled = false;
+    btn.textContent = "Try again";
+    btn.classList.add('err');
+    setTimeout(() => { btn.classList.remove('err'); btn.textContent = "I saw one!"; }, 2200);
+  }
+}
+
+resetBtn.addEventListener('click', () => {
+  logged = [];
+  saveLogged([]);
+  buildGrid();
+});
+
+async function init(){
+  logged = getLogged();
+  buildGrid();
+
+  try{
+    tally = await fetchTally();
+  }catch(e){
+    chartEl.innerHTML = `<p class="empty-note">Couldn't reach the tally right now — check back in a moment.</p>`;
+    return;
+  }
+  renderChart();
+}
+
+init();
+</script>
+</body>
+</html>
