@@ -225,10 +225,10 @@ function renderChart(){
 
   if(rows.length === 0){
     chartEl.innerHTML = `<p class="empty-note">No sightings logged yet — be the first to tap one above.</p>`;
-    chartSubEl.textContent = "Sorted by most-spotted.";
+    chartSubEl.textContent = "This is sorted by the most spotted birds.";
     return;
   }
-  chartSubEl.textContent = "Sorted by most-spotted.";
+  chartSubEl.textContent = "This is sorted by the most spotted birds.";
   const max = rows[0].count;
 
   chartEl.innerHTML = rows.map(r => `
